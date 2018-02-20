@@ -10,3 +10,11 @@
 * [btcpool矿池-slparser(share log parser)模块解析](slparser/slparser.md)
 * [btcpool矿池-statshttpd模块解析](statshttpd/statshttpd.md)
 * [btcpool bug总结](bug.md)
+
+## 架构图
+
+![](btcpool.png)
+
+## 扩展阅读
+
+* [BTCPool for Bitcoin](https://github.com/btccom/btcpool)
