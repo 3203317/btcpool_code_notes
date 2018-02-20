@@ -35,6 +35,10 @@ kafka = {
 };
 ```
 
+### 挖矿模板范例
+
+[getblocktemplate.txt](getblocktemplate.txt)
+
 ### GbtMaker流程图
 
 ![](GbtMaker.png)
