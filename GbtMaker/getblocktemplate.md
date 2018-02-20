@@ -1,3 +1,4 @@
+```
 {
 	"result": {
 		"capabilities": ["proposal"],
@@ -3546,3 +3547,4 @@
 	"error": null,
 	"id": "curltest"
 }
+```

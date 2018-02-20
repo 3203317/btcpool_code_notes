@@ -37,7 +37,7 @@ kafka = {
 
 ### 挖矿模板范例
 
-[getblocktemplate.txt](getblocktemplate.txt)
+[getblocktemplate.txt](getblocktemplate.md)
 
 ### GbtMaker流程图
 
