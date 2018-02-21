@@ -1,5 +1,9 @@
 # btcpool矿池-JobMaker模块解析
 
+### 核心机制总结
+
+* 
+
 ### JobMaker命令使用
 
 JobMaker，用于监听kafka获取最新的比特币Gbt消息、以及域名币NmcAuxBlock消息，并用二者构造StratumJob再发送给kafka。

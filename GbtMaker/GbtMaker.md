@@ -6,7 +6,6 @@
 * 另默认每5秒间隔（可从配置文件中指定）主动RPC请求Bitcoind，获取Gbt发送给kafka
 * Gbt消息大小约2M，含交易列表
 
-
 ### GbtMaker命令使用
 
 GbtMaker用于从比特币节点获取挖矿模板，并发送给kafka。
