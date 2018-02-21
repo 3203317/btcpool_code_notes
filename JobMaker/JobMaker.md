@@ -4,7 +4,7 @@
 
 * 同时监听kafka KAFKA_TOPIC_RAWGBT和KAFKA_TOPIC_NMC_AUXBLOCK，以支持混合挖矿
 * 接收的Gbt消息，如果与本地时间延迟超过60秒将丢弃，如果延迟超过3秒将打印log
-* 可用的Gbt消息，将以gbtTime+isEmptyBlock+height来构造key写入本地Map，另gbtHash也会写入本地deque（双端队列）
+* 可用的Gbt消息，将以gbtTime+isEmptyBlock+height来构造key写入本地Map，另gbtHash也会写入本地队列
 * 本地gbtHash队列仅保存最近20条，本地gbtMap中Gbt消息有效期：非空Gbt有效期90秒，空Gbt有效期15秒，过期将清除
 	* 有效期可从配置文件中指定
 * Gbt消息如果高度低于本地Gbt高度，且本地Gbt非空，且与本地时间间隔没超过2倍stratumJobInterval_，Gbt消息将丢弃
