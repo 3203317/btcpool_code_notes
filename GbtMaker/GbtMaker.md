@@ -37,11 +37,21 @@ kafka = {
 
 ### 挖矿模板范例
 
-[getblocktemplate.txt](getblocktemplate.md)
+[getblocktemplate.txt](getblocktemplate.txt)
 
 ### GbtMaker流程图
 
 ![](GbtMaker.png)
+
+### KAFKA_TOPIC_RAWGBT消息
+
+```
+return Strings::Format("{\"created_at_ts\":%u,"
+	"\"block_template_base64\":\"%s\","
+	"\"gbthash\":\"%s\"}",
+	(uint32_t)time(nullptr), EncodeBase64(gbt).c_str(),
+	gbtHash.ToString().c_str());
+```
 
 ### 参考文档
 
