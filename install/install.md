@@ -1,10 +1,28 @@
-# btcpool环境搭建
+# btcpool环境搭建及使用cgminer测试
 
 本文档基于Ubuntu 16.04 LTS, 64 Bits。
 
+### cgminer测试btcpool
+
+```shell
+#安装cgminer
+apt-get -y install build-essential autoconf automake libtool pkg-config libcurl3-dev libudev-dev
+apt-get -y install libusb-1.0-0-dev
+git clone https://github.com/ckolivas/cgminer.git
+cd cgminer
+sh autogen.sh
+./configure --enable-icarus
+make
+
+#cgminer测试
+./cgminer -o stratum+tcp://39.106.166.249:1800 -u jack -p x --debug --protocol-dump
+#--debug，调试模式
+#--protocol-dump，协议输出
+```
+
 ### 安装ZooKeeper
 
-```
+```shell
 #Install ZooKeeper
 apt-get install -y zookeeper zookeeper-bin zookeeperd
 
@@ -35,7 +53,7 @@ service zookeeper restart
 
 ### 安装Kafka
 
-```
+```shell
 #install depends
 apt-get install -y default-jre
 
@@ -74,7 +92,7 @@ export KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"
 
 ### 安装Bitcoind+ZMQ
 
-```
+```shell
 #Dependencies
 apt-get -y install build-essential libtool autotools-dev automake autoconf pkg-config bsdmainutils python3
 apt-get -y install libssl-dev libboost-all-dev libevent-dev
@@ -107,7 +125,7 @@ swapon /swapfile
 
 ### 安装BTCPool
 
-```
+```shell
 #Build
 cd /work
 wget https://raw.githubusercontent.com/btccom/btcpool/master/install/install_btcpool.sh

@@ -1,6 +1,6 @@
 # btcpool矿池源码笔记
 
-* [btcpool环境搭建](install/install.md)
+* [btcpool环境搭建及使用cgminer测试](install/install.md)
 * [btcpool矿池-GbtMaker模块解析](GbtMaker/GbtMaker.md)
 * [btcpool矿池-JobMaker模块解析](JobMaker/JobMaker.md)
 * [btcpool矿池-StratumServer模块解析](StratumServer/StratumServer.md)

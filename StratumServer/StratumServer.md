@@ -2,7 +2,7 @@
 
 ## StratumServer命令使用
 
-```
+```shell
 sserver -c sserver.cfg -l log_dir
 #-c指定sserver配置文件
 #-l指定日志目录
@@ -10,7 +10,7 @@ sserver -c sserver.cfg -l log_dir
 
 ## sserver.cfg配置文件
 
-```
+```shell
 //是否使用testnet
 testnet = true;
 
