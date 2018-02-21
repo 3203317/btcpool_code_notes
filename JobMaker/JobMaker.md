@@ -4,7 +4,7 @@
 
 JobMaker，用于监听kafka获取最新的比特币Gbt消息、以及域名币NmcAuxBlock消息，并用二者构造StratumJob再发送给kafka。
 
-```
+```shell
 jobmaker -c jobmaker.cfg -l log_dir
 #-c指定jobmaker配置文件
 #-l指定日志目录
@@ -12,7 +12,7 @@ jobmaker -c jobmaker.cfg -l log_dir
 
 ### jobmaker.cfg配置文件
 
-```
+```shell
 //是否使用testnet
 testnet = true;
 
@@ -62,7 +62,7 @@ pool = {
 
 另附StratumJob数据结构定义：
 
-```
+```c++
 class StratumJob {
 public:
   //jobId: timestamp + gbtHash, 目的为保证不重复

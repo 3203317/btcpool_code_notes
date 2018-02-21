@@ -10,7 +10,7 @@
 * [btcpool矿池-statshttpd模块解析](statshttpd/statshttpd.md)
 * [btcpool矿池-PoolWatcher模块解析](PoolWatcher/PoolWatcher.md)
 * [btcpool bug总结](bug.md)
-* [btcpool矿池-优化点](better/better.md)
+* [btcpool矿池-优化思考](better/better.md)
 
 ## 架构图
 
