@@ -53,7 +53,7 @@ users = {
 
 ## 计算挖矿难度
 
-```
+```c++
 //构造函数
 //kMinDiff_为最小难度，static const uint64 kMinDiff_ = 64;
 //kMaxDiff_为最大难度，static const uint64 kMaxDiff_ = 4611686018427387904ull;
@@ -151,7 +151,7 @@ uint64 DiffController::_calcCurDiff() {
 
 ## sserver校验share的机制
 
-```
+```shell
 //本地job列表localJobs_最多保留最近10条任务，如有新任务，将挤出1条老任务。如果share所对应的job未在本地列表中，将StratumError::JOB_NOT_FOUND
 //本地share列表submitShares_中，如果已有本条share，即重复，将StratumError::DUPLICATE_SHARE
 //校验share不通过
@@ -159,6 +159,81 @@ uint64 DiffController::_calcCurDiff() {
 //　　share中nTime小于job的最小时间，过老，报StratumError::TIME_TOO_OLD
 //　　share中nTime超过job中的nTime 10分钟，过新，报StratumError::TIME_TOO_NEW
 //　　区块哈希>job难度目标，不合格，报StratumError::LOW_DIFFICULTY
+```
+
+## sserver下发新job的机制
+
+1、如果收到新高度statum job，将立即下发新job
+
+```c++
+bool isClean = false;
+if (latestPrevBlockHash_ != sjob->prevHash_) {
+	isClean = true;
+	latestPrevBlockHash_ = sjob->prevHash_;
+	LOG(INFO) << "received new height statum job, height: " << sjob->height_
+	<< ", prevhash: " << sjob->prevHash_.ToString();
+}
+shared_ptr<StratumJobEx> exJob = std::make_shared<StratumJobEx>(sjob, isClean);
+{
+	ScopeLock sl(lock_);
+    if (isClean) {
+		// mark all jobs as stale, should do this before insert new job
+		for (auto it : exJobs_) {
+			it.second->markStale();
+		}
+	}
+	// insert new job
+	exJobs_[sjob->jobId_] = exJob;
+}
+if (isClean) {
+	sendMiningNotify(exJob);
+	return;
+}
+```
+
+2、如果过去一个job为新高度且为空块job，并且最新job非空块job，将尽快下发新job
+
+```
+if (isClean == false && exJobs_.size() >= 2) {
+	auto itr = exJobs_.rbegin();
+	shared_ptr<StratumJobEx> exJob1 = itr->second;
+	itr++;
+	shared_ptr<StratumJobEx> exJob2 = itr->second;
+
+	if (exJob2->isClean_ == true &&
+		exJob2->sjob_->merkleBranch_.size() == 0 &&
+		exJob1->sjob_->merkleBranch_.size() != 0) {
+		sendMiningNotify(exJob);
+	}
+}
+```
+
+3、每超过一定时间间隔（30秒），将下发新job
+
+```
+
+void JobRepository::checkAndSendMiningNotify() {
+	// last job is 'expried', send a new one
+	if (exJobs_.size() &&
+		lastJobSendTime_ + kMiningNotifyInterval_ <= time(nullptr))
+	{
+		shared_ptr<StratumJobEx> exJob = exJobs_.rbegin()->second;
+		sendMiningNotify(exJob);
+	}
+}
+
+JobRepository::JobRepository(const char *kafkaBrokers,
+	const string &fileLastNotifyTime,
+	Server *server):
+running_(true),
+kafkaConsumer_(kafkaBrokers, KAFKA_TOPIC_STRATUM_JOB, 0/*patition*/),
+server_(server), fileLastNotifyTime_(fileLastNotifyTime),
+kMaxJobsLifeTime_(300),
+kMiningNotifyInterval_(30),  // TODO: make as config arg
+lastJobSendTime_(0)
+{
+	assert(kMiningNotifyInterval_ < kMaxJobsLifeTime_);
+}
 ```
 
 ## 参考文档
