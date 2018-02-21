@@ -4,7 +4,7 @@
 
 GbtMaker用于从比特币节点获取挖矿模板，并发送给kafka。
 
-```
+```shell
 gbtmaker -c gbtmaker.cfg -l log_dir
 #-c指定gbtmaker配置文件
 #-l指定日志目录
@@ -12,7 +12,7 @@ gbtmaker -c gbtmaker.cfg -l log_dir
 
 ### gbtmaker.cfg配置文件
 
-```
+```shell
 gbtmaker = {
   //rpc调用间隔(秒)
   rpcinterval = 5;
@@ -45,7 +45,7 @@ kafka = {
 
 ### KAFKA_TOPIC_RAWGBT消息
 
-```
+```c++
 return Strings::Format("{\"created_at_ts\":%u,"
 	"\"block_template_base64\":\"%s\","
 	"\"gbthash\":\"%s\"}",
