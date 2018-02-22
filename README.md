@@ -19,3 +19,5 @@
 ## 扩展阅读
 
 * [BTCPool for Bitcoin](https://github.com/btccom/btcpool)
+* [BtcAgent](https://github.com/btccom/btcagent)
+* [BtcAgent通信协议](https://github.com/btccom/btcpool/blob/master/docs/AGENT.md)

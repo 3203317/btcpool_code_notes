@@ -29,8 +29,10 @@
 	* TIME_TOO_OLD，share中提交的nTime比当前时间大10分钟
 	* LOW_DIFFICULTY，share中提交的hash不满足难度目标
 * 处理BtcAgent扩展协议：
-	* 
-	
+	* Agent下矿机默认难度也为16384
+	* 使用Agent sessionID作为extraNonce2_前半部分，以确保Agent下矿机任务不重复
+	* 矿池下发新任务时，如session为BtcAgent，将为Agent下所有矿机计算难度
+		* 如难度发生变更，将按难度不同，分别构造多条CMD_MINING_SET_DIFF指令一并下发处理
 
 ## StratumServer命令使用
 
@@ -270,4 +272,5 @@ lastJobSendTime_(0)
 
 ## 参考文档
 
-待补充
+* [BtcAgent](https://github.com/btccom/btcagent)
+* [BtcAgent通信协议](https://github.com/btccom/btcpool/blob/master/docs/AGENT.md)
