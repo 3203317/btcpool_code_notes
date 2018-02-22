@@ -16,19 +16,22 @@
 * 本地gbtHash队列仅保存最近20条，本地gbtMap中Gbt消息有效期：非空Gbt有效期90秒，空Gbt有效期15秒，过期将清除
 	* 有效期可从配置文件中指定
 * Gbt消息如果高度低于本地Gbt高度，且本地Gbt非空，且与本地时间间隔没超过2倍stratumJobInterval_，Gbt消息将丢弃
-* 三种情况下将向kafka发送StratumJob：
-	* 1、高度大于本地高度（即已发现新块）
-	* 2、高度与本地高度相同，但前个Job为空块Job，但新Gbt非空块
-	* 3、达到预定的时间间隔20秒（可从配置文件中指定）
+* 三种情况下将立即向kafka发送StratumJob：
+	* 高度大于本地高度（即已发现新块）
+	* 高度与本地高度相同，但前个Job为空块Job，但新Gbt非空块
+	* 达到预定的时间间隔20秒（可从配置文件中指定）
 
 ### ③sserver
+
+
+
 
 ### ④⑤⑥⑦⑧⑨
 
 ## GbtMaker优化点
 
-* gbtmaker默认每5秒从bitcoind获取getblocktemplate，是否需加快频率???
-* jobmaker中监听NMC域名币消息以实现混合挖矿，是否仍有价值???
-* gbtmaker每5秒获取一次gbt，而jobmaker每20秒生成一次新job，时间设置是否合理???
-* sserver除收到新高度job立即下发外，每30秒重新下发一次新job，时间设置是否合理???
+* gbtmaker默认每5秒从bitcoind获取getblocktemplate，是否需加快频率？
+* jobmaker中监听NMC域名币消息以实现混合挖矿，是否仍有价值？
+* gbtmaker每5秒获取一次gbt，而jobmaker每20秒生成一次新job，时间设置是否合理？
+* sserver除收到新高度job立即下发外，每30秒重新下发一次新job，时间设置是否合理？
 

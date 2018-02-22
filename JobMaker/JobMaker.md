@@ -1,6 +1,6 @@
 # btcpool矿池-JobMaker模块解析
 
-### 核心机制总结
+## 核心机制总结
 
 * 同时监听kafka KAFKA_TOPIC_RAWGBT和KAFKA_TOPIC_NMC_AUXBLOCK，以支持混合挖矿
 * 接收的Gbt消息，如果与本地时间延迟超过60秒将丢弃，如果延迟超过3秒将打印log
@@ -8,12 +8,12 @@
 * 本地gbtHash队列仅保存最近20条，本地gbtMap中Gbt消息有效期：非空Gbt有效期90秒，空Gbt有效期15秒，过期将清除
 	* 有效期可从配置文件中指定
 * Gbt消息如果高度低于本地Gbt高度，且本地Gbt非空，且与本地时间间隔没超过2倍stratumJobInterval_，Gbt消息将丢弃
-* 三种情况下将向kafka发送StratumJob：
-	* 1、高度大于本地高度（即已发现新块）
-	* 2、高度与本地高度相同，但前个Job为空块Job，但新Gbt非空块
-	* 3、达到预定的时间间隔20秒（可从配置文件中指定）
+* 三种情况下将立即向kafka发送StratumJob：
+	* 高度大于本地高度（即已发现新块）
+	* 高度与本地高度相同，但前个Job为空块Job，但新Gbt非空块
+	* 达到预定的时间间隔20秒（可从配置文件中指定）
 
-### JobMaker命令使用
+## JobMaker命令使用
 
 JobMaker，用于监听kafka获取最新的比特币Gbt消息、以及域名币NmcAuxBlock消息，并用二者构造StratumJob再发送给kafka。
 
@@ -23,7 +23,7 @@ jobmaker -c jobmaker.cfg -l log_dir
 #-l指定日志目录
 ```
 
-### jobmaker.cfg配置文件
+## jobmaker.cfg配置文件
 
 ```shell
 //是否使用testnet
@@ -65,11 +65,11 @@ pool = {
 };
 ```
 
-### JobMaker流程图
+## JobMaker流程图
 
 ![](JobMaker.png)
 
-### 基于Gbt构造StratumJob流程图
+## 基于Gbt构造StratumJob流程图
 
 ![](initFromGbt.png)
 
@@ -120,7 +120,7 @@ public:
 };
 ```
 
-### 参考文档
+## 参考文档
 
 * [基于ZooKeeper的分布式锁和队列](https://www.cnblogs.com/luxiaoxun/p/4889764.html)
 * [ZooKeeper编程笔记](https://www.cnblogs.com/caosiyang/archive/2012/11/09/2763190.html)

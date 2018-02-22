@@ -1,12 +1,12 @@
 # btcpool矿池-GbtMaker模块解析
 
-### 核心机制总结
+## 核心机制总结
 
 * 监听Bitcoind ZMQ中BITCOIND_ZMQ_HASHBLOCK消息，一有新块产生，将立即向kafka发送新Gbt
 * 另默认每5秒间隔（可从配置文件中指定）主动RPC请求Bitcoind，获取Gbt发送给kafka
 * Gbt消息大小约2M，含交易列表
 
-### GbtMaker命令使用
+## GbtMaker命令使用
 
 GbtMaker用于从比特币节点获取挖矿模板，并发送给kafka。
 
@@ -16,7 +16,7 @@ gbtmaker -c gbtmaker.cfg -l log_dir
 #-l指定日志目录
 ```
 
-### gbtmaker.cfg配置文件
+## gbtmaker.cfg配置文件
 
 ```shell
 gbtmaker = {
@@ -41,15 +41,15 @@ kafka = {
 };
 ```
 
-### 挖矿模板范例
+## 挖矿模板范例
 
 [getblocktemplate.txt](getblocktemplate.txt)
 
-### GbtMaker流程图
+## GbtMaker流程图
 
 ![](GbtMaker.png)
 
-### KAFKA_TOPIC_RAWGBT消息
+## KAFKA_TOPIC_RAWGBT消息
 
 ```c++
 return Strings::Format("{\"created_at_ts\":%u,"
@@ -59,7 +59,7 @@ return Strings::Format("{\"created_at_ts\":%u,"
 	gbtHash.ToString().c_str());
 ```
 
-### 参考文档
+## 参考文档
 
 * [Google-glog](http://www.xstring.cn/wiki/doku.php?id=apidoc:xlibrary:%E6%97%A5%E5%BF%97%E5%BA%93:glog)
 * [librdkafka - the Apache Kafka C/C++ client library](https://github.com/edenhill/librdkafka)

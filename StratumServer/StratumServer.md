@@ -1,5 +1,37 @@
 # btcpool矿池-StratumServer模块解析
 
+## 核心机制总结
+
+* 接收的job延迟超过60秒将丢弃
+* 如果job中prevHash与本地job中prevHash不同，即为已产生新块，job中isClean状态将置为true
+	* true即要求矿机立即切换job
+* 三种情况下将向矿机下发新job：
+	* 收到新高度的job
+	* 过去一个job为新高度且为空块job，且最新job为非空块job
+	* 达到预定的时间间隔30秒
+* 最近一次下发job的时间将写入文件（由file_last_notify_time指定）
+* 本地job有效期为300秒
+* 每10秒拉取一次新用户列表（由list_id_api_url指定），用户写入本地map中
+* sserver最大可用SessionId数为16777214
+* btcpool支持BtcAgent扩展协议和Stratum协议，使用magic_number（0x7F）区分
+* 处理Stratum协议：
+	* suggest_target与suggest_difficulty等价，用于设置初始挖矿难度，需在subscribe之前请求
+	* 使用sessionID作为extraNonce1_以确保矿机任务不重复
+	* authorize之前有15秒读超时，authorize之后有10分钟读超时，10分钟无提交将断开连接
+	* 初始难度为16384，或从suggest_difficulty指定，下次将一次调整到位保持10s提交share
+	* 每个session会维护一个localJobs_队列，队列长度为10条
+* share被拒绝的几种情况：
+	* JOB_NOT_FOUND，localJobs_队列中该job已被挤出
+	* DUPLICATE_SHARE，share已提交过，已提交的share会计入submitShares_
+	* JOB_NOT_FOUND，jobRepository_中job不存在，即job已过期（300秒过期时间）
+	* JOB_NOT_FOUND，jobRepository_中job状态为Stale，即job是旧的非新job
+	* TIME_TOO_OLD，share中提交的nTime小于job规定的minTime
+	* TIME_TOO_OLD，share中提交的nTime比当前时间大10分钟
+	* LOW_DIFFICULTY，share中提交的hash不满足难度目标
+* 处理BtcAgent扩展协议：
+	* 
+	
+
 ## StratumServer命令使用
 
 ```shell
