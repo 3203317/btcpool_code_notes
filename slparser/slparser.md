@@ -59,7 +59,7 @@ pooldb = {
 
 [bpool_local_stats_db.txt](bpool_local_stats_db.txt)
 
-```shell
+```c++
 DROP TABLE IF EXISTS `stats_pool_day`;
 CREATE TABLE `stats_pool_day` (
   `day` int(11) NOT NULL,
