@@ -44,15 +44,6 @@ CREATE TABLE `found_blocks` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `found_blocks`
---
-
-LOCK TABLES `found_blocks` WRITE;
-/*!40000 ALTER TABLE `found_blocks` DISABLE KEYS */;
-/*!40000 ALTER TABLE `found_blocks` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `found_nmc_blocks`
 --
 
@@ -70,15 +61,6 @@ CREATE TABLE `found_nmc_blocks` (
   UNIQUE KEY `aux_block_hash` (`aux_block_hash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `found_nmc_blocks`
---
-
-LOCK TABLES `found_nmc_blocks` WRITE;
-/*!40000 ALTER TABLE `found_nmc_blocks` DISABLE KEYS */;
-/*!40000 ALTER TABLE `found_nmc_blocks` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `mining_workers`
@@ -110,16 +92,6 @@ CREATE TABLE `mining_workers` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `mining_workers`
---
-
-LOCK TABLES `mining_workers` WRITE;
-/*!40000 ALTER TABLE `mining_workers` DISABLE KEYS */;
-INSERT INTO `mining_workers` VALUES (8113131267054106046,1,-1,'__default__',0,0,0,0,0,0,0,'0.0.0.0','1970-01-01 00:00:01','cgminer/4.10.0','2018-01-30 08:39:35','2018-02-22 03:15:02'),(8113131267054106046,2,-2,'__default__',0,0,0,0,0,0,0,'0.0.0.0','1970-01-01 00:00:01','stratehm-stratum-proxy-0.8.1','2018-01-30 09:21:00','2018-01-31 10:36:04'),(-5434587744643370638,3,-3,'28x1',0,0,0,0,0,0,572,'47.96.158.184','2017-12-25 12:06:05','bmminer/2.0.0','2017-12-22 15:01:11','2017-12-25 13:13:58'),(0,3,-3,NULL,0,0,0,0,0,0,572,'47.96.158.184','2017-12-25 12:06:05',NULL,'2017-12-22 15:07:12','2017-12-25 13:13:58');
-/*!40000 ALTER TABLE `mining_workers` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `mining_workers_tmp`
 --
 
@@ -147,16 +119,6 @@ CREATE TABLE `mining_workers_tmp` (
   KEY `puid_group_id` (`puid`,`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `mining_workers_tmp`
---
-
-LOCK TABLES `mining_workers_tmp` WRITE;
-/*!40000 ALTER TABLE `mining_workers_tmp` DISABLE KEYS */;
-INSERT INTO `mining_workers_tmp` VALUES (-5434587744643370638,3,-3,NULL,0,0,0,0,0,0,572,'47.96.158.184','2017-12-25 12:06:05',NULL,'2017-12-25 13:13:58','2017-12-25 13:13:58'),(0,3,-3,NULL,0,0,0,0,0,0,572,'47.96.158.184','2017-12-25 12:06:05',NULL,'2017-12-25 13:13:58','2017-12-25 13:13:58');
-/*!40000 ALTER TABLE `mining_workers_tmp` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -167,4 +129,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-02-22 11:15:15
+-- Dump completed on 2018-02-22 14:02:44
