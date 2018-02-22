@@ -11,7 +11,6 @@
 	* 如果Date和UID均未指定，将监听文件变化，读取share并统计数据，每15秒写入数据库
 		* 同时启动Httpd服务，开放ServerStatus和WorkerStatus
 
-
 ## slparser命令使用
 
 ```shell
@@ -23,10 +22,6 @@ slparser -c slparser.cfg -l log_dir3 -d 20160830 -u puid
 #-d指定日期
 #-u指定PUID（即userId），userId为0时dump all, >0时仅输出指定userId的sharelog
 ```
-
-## bpool_local_stats_db数据库结构
-
-[bpool_local_stats_db.txt](bpool_local_stats_db.txt)
 
 ## slparser.cfg配置文件
 
@@ -59,75 +54,97 @@ pooldb = {
 
 ![](slparser.png)
 
-## 入库SQL
 
-```c++
-void ShareLogParser::flushHourOrDailyData(const vector<string> values,
-                                          const string &tableName,
-                                          const string &extraFields) {
-  string mergeSQL;
-  string fields;
+## bpool_local_stats_db数据库结构
 
-  // in case two process use the same tmp table name, we add process id into
-  // tmp table name.
-  const string tmpTableName = Strings::Format("%s_tmp_%d",
-                                              tableName.c_str(), getpid());
+[bpool_local_stats_db.txt](bpool_local_stats_db.txt)
 
-  if (!poolDB_.ping()) {
-    LOG(ERROR) << "can't connect to pool DB";
-    return;
-  }
+```shell
+DROP TABLE IF EXISTS `stats_pool_day`;
+CREATE TABLE `stats_pool_day` (
+  `day` int(11) NOT NULL,
+  `share_accept` bigint(20) NOT NULL DEFAULT '0',
+  `share_reject` bigint(20) NOT NULL DEFAULT '0',
+  `reject_rate` double NOT NULL DEFAULT '0',
+  `score` decimal(35,25) NOT NULL DEFAULT '0.0000000000000000000000000',
+  `earn` bigint(20) NOT NULL DEFAULT '0',
+  `lucky` double NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  UNIQUE KEY `day` (`day`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-  if (values.size() == 0) {
-    LOG(INFO) << "no active workers";
-    return;
-  }
+DROP TABLE IF EXISTS `stats_pool_hour`;
+CREATE TABLE `stats_pool_hour` (
+  `hour` int(11) NOT NULL,
+  `share_accept` bigint(20) NOT NULL DEFAULT '0',
+  `share_reject` bigint(20) NOT NULL DEFAULT '0',
+  `reject_rate` double NOT NULL DEFAULT '0',
+  `score` decimal(35,25) NOT NULL DEFAULT '0.0000000000000000000000000',
+  `earn` bigint(20) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  UNIQUE KEY `hour` (`hour`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-  // drop tmp table
-  const string sqlDropTmpTable = Strings::Format("DROP TABLE IF EXISTS `%s`;",
-                                                 tmpTableName.c_str());
-  // create tmp table
-  const string createTmpTable = Strings::Format("CREATE TABLE `%s` like `%s`;",
-                                                tmpTableName.c_str(), tableName.c_str());
+DROP TABLE IF EXISTS `stats_users_day`;
+CREATE TABLE `stats_users_day` (
+  `puid` int(11) NOT NULL,
+  `day` int(11) NOT NULL,
+  `share_accept` bigint(20) NOT NULL DEFAULT '0',
+  `share_reject` bigint(20) NOT NULL DEFAULT '0',
+  `reject_rate` double NOT NULL DEFAULT '0',
+  `score` decimal(35,25) NOT NULL DEFAULT '0.0000000000000000000000000',
+  `earn` bigint(20) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  UNIQUE KEY `puid_day` (`puid`,`day`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-  if (!poolDB_.execute(sqlDropTmpTable)) {
-    LOG(ERROR) << "DROP TABLE `" << tmpTableName << "` failure";
-    return;
-  }
-  if (!poolDB_.execute(createTmpTable)) {
-    LOG(ERROR) << "CREATE TABLE `" << tmpTableName << "` failure";
-    return;
-  }
+DROP TABLE IF EXISTS `stats_users_hour`;
+CREATE TABLE `stats_users_hour` (
+  `puid` int(11) NOT NULL,
+  `hour` int(11) NOT NULL,
+  `share_accept` bigint(20) NOT NULL DEFAULT '0',
+  `share_reject` bigint(20) NOT NULL DEFAULT '0',
+  `reject_rate` double NOT NULL DEFAULT '0',
+  `score` decimal(35,25) NOT NULL DEFAULT '0.0000000000000000000000000',
+  `earn` bigint(20) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  UNIQUE KEY `puid_hour` (`puid`,`hour`),
+  KEY `hour` (`hour`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-  // fields for table.stats_xxxxx_hour
-  fields = Strings::Format("%s `share_accept`,`share_reject`,`reject_rate`,"
-                           "`score`,`earn`,`created_at`,`updated_at`", extraFields.c_str());
+DROP TABLE IF EXISTS `stats_workers_day`;
+CREATE TABLE `stats_workers_day` (
+  `puid` int(11) NOT NULL,
+  `worker_id` bigint(20) NOT NULL,
+  `day` int(11) NOT NULL,
+  `share_accept` bigint(20) NOT NULL DEFAULT '0',
+  `share_reject` bigint(20) NOT NULL DEFAULT '0',
+  `reject_rate` double NOT NULL DEFAULT '0',
+  `score` decimal(35,25) NOT NULL DEFAULT '0.0000000000000000000000000',
+  `earn` bigint(20) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  UNIQUE KEY `puid_worker_id_day` (`puid`,`worker_id`,`day`),
+  KEY `day` (`day`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-  if (!multiInsert(poolDB_, tmpTableName, fields, values)) {
-    LOG(ERROR) << "multi-insert table." << tmpTableName << " failure";
-    return;
-  }
-
-  // merge two table items
-  mergeSQL = Strings::Format("INSERT INTO `%s` "
-                             " SELECT * FROM `%s` AS `t2` "
-                             " ON DUPLICATE KEY "
-                             " UPDATE "
-                             "  `share_accept` = `t2`.`share_accept`, "
-                             "  `share_reject` = `t2`.`share_reject`, "
-                             "  `reject_rate`  = `t2`.`reject_rate`, "
-                             "  `score`        = `t2`.`score`, "
-                             "  `earn`         = `t2`.`earn`, "
-                             "  `updated_at`   = `t2`.`updated_at` ",
-                             tableName.c_str(), tmpTableName.c_str());
-  if (!poolDB_.update(mergeSQL)) {
-    LOG(ERROR) << "merge mining_workers failure";
-    return;
-  }
-
-  if (!poolDB_.execute(sqlDropTmpTable)) {
-    LOG(ERROR) << "DROP TABLE `" << tmpTableName << "` failure";
-    return;
-  }
-}
+DROP TABLE IF EXISTS `stats_workers_hour`;
+CREATE TABLE `stats_workers_hour` (
+  `puid` int(11) NOT NULL,
+  `worker_id` bigint(20) NOT NULL,
+  `hour` int(11) NOT NULL,
+  `share_accept` bigint(20) NOT NULL DEFAULT '0',
+  `share_reject` bigint(20) NOT NULL DEFAULT '0',
+  `reject_rate` double NOT NULL DEFAULT '0',
+  `score` decimal(35,25) NOT NULL DEFAULT '0.0000000000000000000000000',
+  `earn` bigint(20) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  UNIQUE KEY `puid_worker_id_hour` (`puid`,`worker_id`,`hour`),
+  KEY `hour` (`hour`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
