@@ -8,7 +8,7 @@
 
 ## sharelogger命令使用
 
-```
+```shell
 sharelogger -c sharelogger.cfg -l log_dir
 #-c指定sharelogger配置文件
 #-l指定日志目录
@@ -16,7 +16,7 @@ sharelogger -c sharelogger.cfg -l log_dir
 
 ## sharelogger.cfg配置文件
 
-```
+```shell
 kafka = {
   brokers = "1.1.1.1:9092,2.2.2.2:9092,3.3.3.3:9092";
 };
