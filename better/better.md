@@ -73,7 +73,9 @@
 	
 ### ⑤sharelogger
 
-
+* 接收SHARE_LOG，写入shares_，每2秒写入文件（路径由data_dir指定）
+	* 每天一个新文件，文件名形如：sharelog-2016-07-12.bin
+	* 最多维护最近3天的文件句柄
 
 ### ⑥
 
