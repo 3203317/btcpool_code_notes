@@ -90,8 +90,27 @@
 
 ### ⑦statshttpd
 
-### ⑧
+* 监听并接收SHARE_LOG，按Worker、user、pool统计acceptCount_、acceptShareSec_、rejectShareMin_
+	* 同时统计totalWorkerCount_和totalUserCount_
+	* 延时超过1小时的SHARE_LOG将被忽略
+* 每15s写入数据库（可由flush_db_interval指定），每30分钟清理过期Worker
+	* 如果Worker超过1小时未提交share，将被置为过期状态
+	* 计算每个Worker的accept1m_、accept5m_、accept15m_、reject15m_、accept1h_、reject1h_
+		* 以及acceptCount_、lastShareIP_、lastShareTime_
+	* DROP并CREATE数据表mining_workers_tmp，Worker统计数据批量写入mining_workers_tmp
+	* mining_workers_tmp数据写入数据表mining_workers
+* 监听并接收COMMON_EVENTS，获取workerName和minerAgent，更新数据表mining_workers
+* 启动Httpd服务，开放ServerStatus和WorkerStatus
 
-### ⑨
+### ⑧poolwatcher
+
+* 监听StratumJob，更新poolStratumJob_，用于和第三方矿池比对
+* 作为client连接第三方矿池，如收到挖矿任务，仅当接收的job高度=本地矿池job高度+1时，将构造EmptyGBT
+* 如下几种情况将丢弃从第三方矿池接收的job：
+	* job高度与本地矿池job高度相同
+	* job高度不等于本地矿池job高度+1，高度跳跃太大
+	* nBits与本地矿池job nBits不同
 
 ## 优化思考
+
+待补充
