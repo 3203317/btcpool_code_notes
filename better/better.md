@@ -55,6 +55,30 @@
 	* 矿池下发新任务时，如session为BtcAgent，将为Agent下所有矿机计算难度
 		* 如难度发生变更，将按难度不同，分别构造多条CMD_MINING_SET_DIFF指令一并下发处理
 
-### ④
+### ④blkmaker
 
-⑤⑥⑦⑧⑨
+* blkmaker可以连多个bitcoind节点
+* blkmaker监听和接收4类消息：RAWGBT、STRATUM_JOB、SOLVED_SHARE和NMC_SOLVED_SHARE
+* 监听RAWGBT目的为获取gbtHash/交易列表，用于构建Block，gbtHash和vtxs写入rawGbtMap_
+	* rawGbtMap_保存最近100条gbtHash/vtxs对
+* 监听STRATUM_JOB目的为获取jobId_/gbtHash，jobId_和gbtHash写入jobId2GbtHash_
+	* jobId2GbtHash_保存最近120条jobId_/gbtHash对
+* 监听SOLVED_SHARE目的为获取BlockHeader和coinbaseTx
+	* BlockHeader+coinbaseTx+vtxs构造Block
+* 构造好的Block会提交连接的所有bitcoind节点
+* 构造好的Block入库，入库字段包括：
+	* puid、worker_id、worker_full_name、job_id、height、hash
+	* rewards（即coinbaseValue）、size（即blksize）、prev_hash、bits、version、created_at
+	* created_at为入库时间非爆块时间
+	
+### ⑤sharelogger
+
+
+
+### ⑥
+
+### ⑦
+
+### ⑧
+
+### ⑨

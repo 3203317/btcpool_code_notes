@@ -85,6 +85,33 @@ users = {
 
 * [Stratum mining protocol](StratumServer.png)
 
+## SOLVED_SHARE消息
+
+```c++
+if (isSubmitInvalidBlock_ == true || bnBlockHash <= bnNetworkTarget) {
+	//
+	// build found block
+	//
+	FoundBlock foundBlock;
+	foundBlock.jobId_    = share.jobId_;
+	foundBlock.workerId_ = share.workerHashId_;
+	foundBlock.userId_   = share.userId_;
+	foundBlock.height_   = sjob->height_;
+	memcpy(foundBlock.header80_, (const uint8_t *)&header, sizeof(CBlockHeader));
+	snprintf(foundBlock.workerFullName_, sizeof(foundBlock.workerFullName_),
+		"%s", workFullName.c_str());
+	// send
+	sendSolvedShare2Kafka(&foundBlock, coinbaseBin);
+
+	// mark jobs as stale
+	jobRepository_->markAllJobsAsStale();
+
+	LOG(INFO) << ">>>> found a new block: " << blkHash.ToString()
+	<< ", jobId: " << share.jobId_ << ", userId: " << share.userId_
+	<< ", by: " << workFullName << " <<<<";
+}
+```
+
 ## 计算挖矿难度
 
 ```c++
