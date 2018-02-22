@@ -1,26 +1,33 @@
-# btcpool环境搭建及使用cgminer测试
+# btcpool矿池-测试环境搭建及使用cgminer测试
 
 本文档基于Ubuntu 16.04 LTS, 64 Bits。
 
-### cgminer测试btcpool
+## 安装Bitcoind+ZMQ
 
 ```shell
-#安装cgminer
-apt-get -y install build-essential autoconf automake libtool pkg-config libcurl3-dev libudev-dev
-apt-get -y install libusb-1.0-0-dev
-git clone https://github.com/ckolivas/cgminer.git
-cd cgminer
-sh autogen.sh
-./configure --enable-icarus
-make
+#Dependencies
+apt-get -y install build-essential libtool autotools-dev automake autoconf pkg-config bsdmainutils python3
+apt-get -y install libssl-dev libboost-all-dev libevent-dev
+apt-get -y install libdb-dev libdb++-dev
+apt-get -y install libminiupnpc-dev libzmq3-dev
+apt-get -y install libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev
 
-#cgminer测试
-./cgminer -o stratum+tcp://39.106.166.249:1800 -u jack -p x --debug --protocol-dump
-#--debug，调试模式
-#--protocol-dump，协议输出
+#To Build
+wget https://github.com/bitcoin/bitcoin/archive/v0.15.1.tar.gz
+tar -zxvf bitcoin-0.15.1.tar.gz
+cd bitcoin-0.15.1/
+./autogen.sh
+./configure --with-incompatible-bdb --prefix=/work/bitcoin
+make
+make install
+
+#start/stop service
+cd /work/bitcoin/bin/
+./bitcoind --daemon -testnet -zmqpubhashtx=tcp://0.0.0.0:18331 -zmqpubhashblock=tcp://0.0.0.0:18331
+#./bitcoin-cli -testnet stop
 ```
 
-### 安装ZooKeeper
+## 安装ZooKeeper
 
 ```shell
 #Install ZooKeeper
@@ -51,7 +58,7 @@ service zookeeper restart
 #service zookeeper start/stop/restart/status
 ```
 
-### 安装Kafka
+## 安装Kafka
 
 ```shell
 #install depends
@@ -82,48 +89,7 @@ cd /work/kafka
 nohup /work/kafka/bin/kafka-server-start.sh /work/kafka/config/server.properties > /dev/null 2>&1 &
 ```
 
-Native memory allocation (mmap) failed to map 1073741824 bytes for committing reserved memory.解决办法：
-
-```
-vim /work/kafka/bin/kafka-server-start.sh
-export KAFKA_HEAP_OPTS="-Xmx1G -Xms1G"修改为
-export KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"
-```
-
-### 安装Bitcoind+ZMQ
-
-```shell
-#Dependencies
-apt-get -y install build-essential libtool autotools-dev automake autoconf pkg-config bsdmainutils python3
-apt-get -y install libssl-dev libboost-all-dev libevent-dev
-apt-get -y install libdb-dev libdb++-dev
-apt-get -y install libminiupnpc-dev libzmq3-dev
-apt-get -y install libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev
-
-#To Build
-git clone https://github.com/bitcoin/bitcoin.git
-cd bitcoin/
-git checkout -b v0.15.1 v0.15.1
-./autogen.sh
-./configure --with-incompatible-bdb --prefix=/work/bitcoin
-make
-make install
-
-#start/stop service
-cd /work/bitcoin/bin/
-./bitcoind --daemon
-#./bitcoin-cli stop
-```
-
-g++: internal compiler error: Killed (program cc1plus)问题解决:
-
-```
-dd if=/dev/zero of=/swapfile bs=64M count=16
-mkswap /swapfile
-swapon /swapfile
-```
-
-### 安装BTCPool
+## 安装BTCPool
 
 ```shell
 #Build
@@ -182,14 +148,66 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j $CPUS
 ```
 
-### 官方文档
+## 启动BTCPool
+
+### 启动gbtmaker
+
+```shell
+cd /work/btcpool/build/
+mkdir run_gbtmaker
+cd run_gbtmaker/
+ln -s ../gbtmaker
+cp /work/btcpool/src/gbtmaker/gbtmaker.cfg ./
+vim gbtmaker.cfg
+
+gbtmaker = {
+  rpcinterval = 5;
+  is_check_zmq = true;
+};
+bitcoind = {
+  zmq_addr = "tcp://127.0.0.1:18331";
+  rpc_addr    = "http://127.0.0.1:18332";
+  rpc_userpwd = "bitcoinrpc:xxxx";
+};
+kafka = {
+  brokers = "127.0.0.1:9092";
+};
+
+#启动gbtmaker
+cd /work/btcpool/build/run_gbtmaker/
+mkdir log_gbtmaker
+./gbtmaker -c ./gbtmaker.cfg -l ./log_gbtmaker &
+tail -f log_gbtmaker/gbtmaker.INFO
+```
+
+### 
+
+## cgminer测试btcpool
+
+```shell
+#安装cgminer
+apt-get -y install build-essential autoconf automake libtool pkg-config libcurl3-dev libudev-dev
+apt-get -y install libusb-1.0-0-dev
+git clone https://github.com/ckolivas/cgminer.git
+cd cgminer
+sh autogen.sh
+./configure --enable-icarus
+make
+
+#cgminer测试
+./cgminer -o stratum+tcp://39.106.166.249:1800 -u jack -p x --debug --protocol-dump
+#--debug，调试模式
+#--protocol-dump，协议输出
+```
+
+## 官方文档
 
 * [Install ZooKeeper](https://github.com/btccom/btcpool/blob/master/docs/INSTALL-ZooKeeper.md)
 * [Install Kafka](https://github.com/btccom/btcpool/blob/master/docs/INSTALL-Kafka.md)
 * [Bitcoind Unix Build Notes](https://github.com/bitcoin/bitcoin/blob/master/doc/build-unix.md)
 * [Install BTC.COM Pool](https://github.com/btccom/btcpool/blob/master/INSTALL.md)
 
-### 扩展阅读
+## 扩展阅读
 
 * [比特币挖矿——介绍](https://www.jianshu.com/p/06d9bd788357)
 * [比特币挖矿——区块链技术](https://www.jianshu.com/p/a3f4b2b2d4fa)

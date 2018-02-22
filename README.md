@@ -1,6 +1,6 @@
 # btcpool矿池源码笔记
 
-* [btcpool环境搭建及使用cgminer测试](install/install.md)
+* [btcpool矿池-测试环境搭建及使用cgminer测试](install/install.md)
 * [btcpool矿池-GbtMaker模块解析](GbtMaker/GbtMaker.md)
 * [btcpool矿池-JobMaker模块解析](JobMaker/JobMaker.md)
 * [btcpool矿池-StratumServer模块解析](StratumServer/StratumServer.md)
@@ -9,7 +9,7 @@
 * [btcpool矿池-slparser(share log parser)模块解析](slparser/slparser.md)
 * [btcpool矿池-statshttpd模块解析](statshttpd/statshttpd.md)
 * [btcpool矿池-PoolWatcher模块解析](PoolWatcher/PoolWatcher.md)
-* [btcpool bug总结](bug.md)
+* [btcpool矿池-bug总结](bug.md)
 * [btcpool矿池-核心机制总结及优化思考](better/better.md)
 
 ## 架构图

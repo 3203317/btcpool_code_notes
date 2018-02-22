@@ -1,4 +1,4 @@
-# btcpool bug总结
+# btcpool矿池-bug总结
 
 ## 默认误启用WORK_WITH_STRATUM_SWITCHER并导致无法兼容标准Stratum协议
 
