@@ -148,11 +148,12 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j $CPUS
 ```
 
-## 启动BTCPool
+## 启动BTCPool及cgminer测试btcpool
 
 ### 启动gbtmaker
 
 ```shell
+#配置gbtmaker
 cd /work/btcpool/build/
 mkdir run_gbtmaker
 cd run_gbtmaker/
@@ -180,12 +181,83 @@ mkdir log_gbtmaker
 tail -f log_gbtmaker/gbtmaker.INFO
 ```
 
-### 
+### 启动jobmaker
 
-## cgminer测试btcpool
+```shell
+#配置jobmaker
+cd /work/btcpool/build/
+mkdir run_jobmaker
+cd run_jobmaker/
+ln -s ../jobmaker
+cp /work/btcpool/src/jobmaker/jobmaker.cfg ./
+vim jobmaker.cfg
+
+testnet = true;
+jobmaker = {
+  stratum_job_interval = 20;
+  gbt_life_time = 90;
+  empty_gbt_life_time = 15;
+  file_last_job_time = "/work/btcpool/build/run_jobmaker/jobmaker_lastjobtime.txt";
+  block_version = 0;
+};
+kafka = {
+  brokers = "127.0.0.1:9092";
+};
+zookeeper = {
+  brokers = "127.0.0.1:2181";
+};
+pool = {
+  payout_address = "mi9vpXBWJ31WGpRU7n7VJQG4PvTndHBoCN";
+  coinbase_info = "region1/Project BTCPool/";
+};
+
+#启动jobmaker
+cd /work/btcpool/build/run_jobmaker/
+mkdir log_jobmaker
+./jobmaker -c ./jobmaker.cfg -l ./log_jobmaker &
+tail -f log_jobmaker/jobmaker.INFO
+```
+
+### 启动sserver
+
+```shell
+#配置sserver
+cd /work/btcpool/build/
+mkdir run_sserver
+cd run_sserver/
+ln -s ../sserver
+cp /work/btcpool/src/sserver/sserver.cfg ./
+vim ./sserver.cfg
+
+testnet = true;
+kafka = {
+  brokers = "127.0.0.1:9092";
+};
+sserver = {
+  ip = "0.0.0.0";
+  port = 3333;
+  id = 1;
+  file_last_notify_time = "/work/btcpool/build/run_sserver/sserver_lastnotifytime.txt";
+  enable_simulator = false;
+  enable_submit_invalid_block = false;
+  share_avg_seconds = 10;
+};
+users = {
+  list_id_api_url = "http://index.qubtc.com/apidemo.php";
+};
+
+#启动sserver
+cd /work/btcpool/build/run_sserver/
+mkdir log_sserver
+./sserver -c ./sserver.cfg -l ./log_sserver &
+tail -f log_sserver/sserver.INFO
+```
+
+### cgminer测试btcpool
 
 ```shell
 #安装cgminer
+cd /work/
 apt-get -y install build-essential autoconf automake libtool pkg-config libcurl3-dev libudev-dev
 apt-get -y install libusb-1.0-0-dev
 git clone https://github.com/ckolivas/cgminer.git
@@ -195,9 +267,48 @@ sh autogen.sh
 make
 
 #cgminer测试
-./cgminer -o stratum+tcp://39.106.166.249:1800 -u jack -p x --debug --protocol-dump
+./cgminer -o stratum+tcp://127.0.0.1:3333 -u jack -p x
+#./cgminer -o stratum+tcp://127.0.0.1:3333 -u jack -p x --debug --protocol-dump
 #--debug，调试模式
 #--protocol-dump，协议输出
+```
+
+### 启动blkmaker
+
+```shell
+#安装MySQL
+待补充
+
+#配置blkmaker
+cd /work/btcpool/build/
+mkdir run_blkmaker
+cd run_blkmaker/
+ln -s ../blkmaker
+cp /work/btcpool/src/blkmaker/blkmaker.cfg ./
+vim blkmaker.cfg
+
+bitcoinds = (
+{
+  rpc_addr    = "http://127.0.0.1:18332";
+  rpc_userpwd = "bitcoinrpc:xxxx";
+}
+);
+kafka = {
+  brokers = "127.0.0.1:9092";
+};
+pooldb = {
+  host = "localhost";
+  port = 3306;
+  username = "develop";
+  password = "iZ2ze3r0li2kgfvjkvs2xeZ";
+  dbname = "bpool_local_db";
+};
+
+#启动blkmaker
+cd /work/btcpool/build/run_blkmaker/
+mkdir log_blkmaker
+./blkmaker -c ./blkmaker.cfg -l ./log_blkmaker &
+tail -f log_blkmaker/blkmaker.INFO
 ```
 
 ## 官方文档
