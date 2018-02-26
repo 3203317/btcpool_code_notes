@@ -263,11 +263,13 @@ apt-get -y install libusb-1.0-0-dev
 git clone https://github.com/ckolivas/cgminer.git
 cd cgminer
 sh autogen.sh
-./configure --enable-icarus
+./configure --enable-cpumining --disable-opencl
 make
 
 #cgminer测试
-./cgminer -o stratum+tcp://127.0.0.1:3333 -u jack -p x
+./cgminer --cpu-threads 3 -o stratum+tcp://127.0.0.1:3333 -u jack -p x
+
+./cgminer --cpu-threads 3 --url 127.0.0.1:3333 --userpass jack:x
 #./cgminer -o stratum+tcp://127.0.0.1:3333 -u jack -p x --debug --protocol-dump
 #--debug，调试模式
 #--protocol-dump，协议输出
@@ -327,3 +329,4 @@ tail -f log_blkmaker/blkmaker.INFO
 * [比特币挖矿——p2pool矿池](https://www.jianshu.com/p/ea1cc9cea3a3)
 * [比特币挖矿——建立Kafka&ZooKeeper集群](https://www.jianshu.com/p/083b6192a505)
 * [比特币挖矿——集群矿池btcpool](https://www.jianshu.com/p/af5dc2cab0a9)
+* [Ubuntu: 用cgminer挖掘CPU比特币(bitcoin)](https://lesca.me/archives/mine-bitcoin-on-cpu-with-cgminer.html)

@@ -83,7 +83,7 @@ users = {
 
 ## StratumServer流程图
 
-* [Stratum mining protocol](StratumServer.png)
+![](StratumServer.png)
 
 ## SOLVED_SHARE消息
 
